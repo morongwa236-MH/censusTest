@@ -282,6 +282,11 @@ function collectFormData() {
 
 // Function to handle form submission
 if (document.getElementById('censusForm')) {
+    document.addEventListener('DOMContentLoaded', () => {
+        addMemberForm();
+        addChildForm();
+    });
+
     document.getElementById('censusForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = collectFormData();
@@ -299,14 +304,19 @@ if (document.getElementById('censusForm')) {
             });
 
             if (response.ok) {
-                alert('Form submitted successfully! Thank you.');
-                e.target.reset();
-                document.getElementById('members-container').innerHTML = '';
-                document.getElementById('children-container').innerHTML = '';
-                addMemberForm();
-                addChildForm();
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Form submitted successfully! Thank you.');
+                    e.target.reset();
+                    document.getElementById('members-container').innerHTML = '';
+                    document.getElementById('children-container').innerHTML = '';
+                    addMemberForm();
+                    addChildForm();
+                } else {
+                    alert('Submission failed: ' + result.message);
+                }
             } else {
-                alert('Submission failed. Please try again.');
+                alert('Submission failed. Please check the console for more details.');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -315,6 +325,14 @@ if (document.getElementById('censusForm')) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Form';
         }
+    });
+
+    document.getElementById('addMemberBtn').addEventListener('click', () => {
+        document.getElementById('members-container').insertAdjacentHTML('beforeend', createMemberForm());
+    });
+    
+    document.getElementById('addChildBtn').addEventListener('click', () => {
+        document.getElementById('children-container').insertAdjacentHTML('beforeend', createChildForm());
     });
 
     function addMemberForm() {
@@ -326,7 +344,4 @@ if (document.getElementById('censusForm')) {
         const childrenContainer = document.getElementById('children-container');
         childrenContainer.insertAdjacentHTML('beforeend', createChildForm());
     }
-
-    document.getElementById('addMemberBtn').addEventListener('click', addMemberForm);
-    document.getElementById('addChildBtn').addEventListener('click', addChildForm);
 }
