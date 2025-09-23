@@ -3,62 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Church Census Form - Our Lady of Fatima Shrine</title>
+    <title>Household Census Form</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="logo-container">
-            <img src="https://i.ibb.co/6y45s1x/our-lady-of-fatima-shrine.jpg" alt="Our Lady of Fatima Shrine Logo" class="logo">
-            <h1>Our Lady of Fatima Shrine</h1>
-        </div>
-        <p>1989 Phillip Mpiwa Str.<br>P.O. Box 8005<br>Galeshewe<br>KIMBERLEY, 8301<br>Email: fatimashrinekby@gmail.com</p>
-    </header>
-
-    <main class="container">
-        <h2>Church Census Form</h2>
+    <div class="container">
+        <h1>Household Census Form</h1>
         <form id="censusForm">
-            <div class="section" id="household-section">
-                <h3>Household Information</h3>
+            <!-- Household Information -->
+            <fieldset>
+                <legend>Household Information</legend>
                 <label for="blockName">Block Name:</label>
                 <input type="text" id="blockName" name="blockName" required>
-                
                 <label for="residentialAddress">Residential Address:</label>
                 <input type="text" id="residentialAddress" name="residentialAddress" required>
-                
-                <label for="contactNo">Contact Number:</label>
+                <label for="contactNo">Contact No:</label>
                 <input type="tel" id="contactNo" name="contactNo" required>
-            </div>
+            </fieldset>
 
-            <div class="section">
-                <h3>Members Information</h3>
-                <div id="members-container">
-                    </div>
-                <button type="button" id="addMemberBtn" class="add-button">➕ Add Another Member</button>
-            </div>
+            <!-- Members Section -->
+            <fieldset>
+                <legend>Members</legend>
+                <div id="members-container"></div>
+                <button type="button" id="addMemberBtn">Add Another Member</button>
+            </fieldset>
 
-            <div class="section">
-                <h3>Children Information</h3>
-                <div id="children-container">
-                    </div>
-                <button type="button" id="addChildBtn" class="add-button">➕ Add Another Child</button>
-            </div>
+            <!-- Children Section -->
+            <fieldset>
+                <legend>Children</legend>
+                <div id="children-container"></div>
+                <button type="button" id="addChildBtn">Add Another Child</button>
+            </fieldset>
 
-            <button type="submit" class="submit-button">Submit Form</button>
+            <button type="submit">Submit Form</button>
         </form>
-    </main>
-
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwpsMpkLyGNh8ACiAxHuUfNDwd0QgjWI6BKKoPzHtIvrAcwpUTgUkB7FUcjvHyM2Lyu/exec';
-    </script>
+    </div>
     <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            addMemberForm();
-            addChildForm();
-        });
-    </script>
 </body>
 </html>
-
-
