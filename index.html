@@ -3,44 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Household Census Form</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Our Lady of Fatima Shrine - Census Form</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; padding: 20px; max-width: 900px; margin: auto; background-color: #f4f4f4; }
+        h1, h2 { text-align: center; color: #333; }
+        .form-section { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .member, .child { border: 1px dashed #ccc; padding: 15px; margin-top: 15px; border-radius: 6px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="text"], input[type="date"], input[type="email"], input[type="tel"], select, textarea { width: 100%; padding: 8px; box-sizing: border-box; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-add, .btn-submit { display: block; width: fit-content; margin: 15px 0; padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; text-align: center; }
+        .btn-add:hover, .btn-submit:hover { background-color: #0056b3; }
+        .sub-section { border-left: 2px solid #007BFF; padding-left: 10px; margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Household Census Form</h1>
-        <form id="censusForm">
-            <!-- Household Information -->
-            <fieldset>
-                <legend>Household Information</legend>
-                <label for="blockName">Block Name:</label>
-                <input type="text" id="blockName" name="blockName" required>
-                <label for="residentialAddress">Residential Address:</label>
-                <input type="text" id="residentialAddress" name="residentialAddress" required>
-                <label for="contactNo">Contact No:</label>
-                <input type="tel" id="contactNo" name="contactNo" required>
-            </fieldset>
+    <h1>Our Lady of Fatima Shrine - Census 2024</h1>
+    <form id="census-form">
+        <div class="form-section">
+            <h2>🏠 Household Information</h2>
+            <label for="block-name">Block Name:</label>
+            <input type="text" id="block-name" name="blockName" required>
 
-            <!-- Members Section -->
-            <fieldset>
-                <legend>Members</legend>
-                <div id="members-container"></div>
-                <button type="button" id="addMemberBtn">Add Another Member</button>
-            </fieldset>
+            <label for="residential-address">Residential Address:</label>
+            <input type="text" id="residential-address" name="residentialAddress" required>
 
-            <!-- Children Section -->
-            <fieldset>
-                <legend>Children</legend>
-                <div id="children-container"></div>
-                <button type="button" id="addChildBtn">Add Another Child</button>
-            </fieldset>
+            <label for="contact-no">Contact No (Main Member):</label>
+            <input type="tel" id="contact-no" name="contactNo" required>
+        </div>
 
-            <button type="submit">Submit Form</button>
-        </form>
-    </div>
-    <script src="script.js"></script>
+        <div class="form-section">
+            <h2>👨‍👩‍👧‍👦 Members Information</h2>
+            <div id="members-container">
+                </div>
+            <button type="button" class="btn-add" onclick="addMember()">➕ Add Another Member</button>
+        </div>
+
+        <div class="form-section">
+            <h2>👶 Children Information</h2>
+            <div id="children-container">
+                </div>
+            <button type="button" class="btn-add" onclick="addChild()">➕ Add Another Child</button>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Form</button>
+    </form>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyi2xL07XFPRZumTMT-WBsll2GJ0e-Jmonj89ByUlhyrP5ynXLjAVRl_igqv2IUEqXz/exec';
+        let memberCount = 0;
+        let childCount = 0;
+
+        function createMemberForm(index) {
+            return `
+            <div class="member" id="member-${index}">
+                <h3>Member ${index + 1}</h3>
+                <label>First Name:</label><input type="text" name="members[${index}][firstName]" required>
+                <label>Last Name:</label><input type="text" name="members[${index}][lastName]" required>
+                <label>Date of Birth:</label><input type="date" name="members[${index}][dateOfBirth]" required>
+                <label>Catholic?:</label><select name="members[${index}][isCatholic]" required><option value="Yes">Yes</option><option value="No">No</option></select>
+                <label>Occupation:</label><input type="text" name="members[${index}][occupation]">
+                <label>Church Activities:</label><textarea name="members[${index}][churchActivities]"></textarea>
+                <label>Solidarity/Ministry:</label><textarea name="members[${index}][solidarityMinistry]"></textarea>
+                <label>Leadership:</label><input type="text" name="members[${index}][leadership]">
+                
+                <div class="sub-section">
+                    <h4>Baptism</h4>
+                    <label>Baptised?:</label><select name="members[${index}][isBaptised]" onchange="toggleFields(this, 'baptism', ${index}, 'member')"><option value="No">No</option><option value="Yes">Yes</option></select>
+                    <div id="baptism-fields-member-${index}" style="display: none;">
+                        <label>Date of Baptism:</label><input type="date" name="members[${index}][dateOfBaptism]">
+                        <label>Registration Number:</label><input type="text" name="members[${index}][baptismRegistrationNo]">
+                        <label>Church of Baptism:</label><input type="text" name="members[${index}][baptismChurch]">
+                        <label>Location of Church:</label><input type="text" name="members[${index}][baptismLocation]">
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h4>1st Communion</h4>
+                    <label>1st Communion?:</label><select name="members[${index}][isFirstCommunion]" onchange="toggleFields(this, 'firstCommunion', ${index}, 'member')"><option value="No">No</option><option value="Yes">Yes</option></select>
+                    <div id="firstCommunion-fields-member-${index}" style="display: none;">
+                        <label>Date of 1st Communion:</label><input type="date" name="members[${index}][dateFirstCommunion]">
+                        <label>Church of 1st Communion:</label><input type="text" name="members[${index}][firstCommunionChurch]">
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h4>Confirmation</h4>
+                    <label>Confirmation?:</label><select name="members[${index}][isConfirmation]" onchange="toggleFields(this, 'confirmation', ${index}, 'member')"><option value="No">No</option><option value="Yes">Yes</option></select>
+                    <div id="confirmation-fields-member-${index}" style="display: none;">
+                        <label>Date of Confirmation:</label><input type="date" name="members[${index}][dateOfConfirmation]">
+                        <label>Church of Confirmation:</label><input type="text" name="members[${index}][confirmationChurch]">
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h4>Marital Status</h4>
+                    <label>Marital Status:</label><select name="members[${index}][maritalStatus]"><option value="Single">Single</option><option value="Married">Married</option><option value="Widow(er)">Widow(er)</option></select>
+                    <label>Civil Court Marriage Date:</label><input type="date" name="members[${index}][civilCourtMarriageDate]">
+                    <label>Church Marriage Date:</label><input type="date" name="members[${index}][churchMarriageDate]">
+                    <label>Church Marriage Place:</label><input type="text" name="members[${index}][churchMarriagePlace]">
+                    <label>Divorced?:</label><select name="members[${index}][isDivorced]"><option value="No">No</option><option value="Yes">Yes</option></select>
+                </div>
+
+                <div class="sub-section">
+                    <h4>Dikabelo</h4>
+                    <label>Dikabelo?:</label><select name="members[${index}][isDikabelo]" onchange="toggleFields(this, 'dikabelo', ${index}, 'member')"><option value="No">No</option><option value="Yes">Yes</option></select>
+                    <div id="dikabelo-fields-member-${index}" style="display: none;">
+                        <label>Date of Last Dikabelo:</label><input type="date" name="members[${index}][dateLastDikabelo]">
+                    </div>
+                </div>
+            </div>`;
+        }
+        
+        function createChildForm(index) {
+            return `
+            <div class="child" id="child-${index}">
+                <h3>Child ${index + 1}</h3>
+                <label>First Name:</label><input type="text" name="children[${index}][firstName]" required>
+                <label>Last Name:</label><input type="text" name="children[${index}][lastName]" required>
+                <label>Date of Birth:</label><input type="date" name="children[${index}][dateOfBirth]" onchange="calculateAge(this, ${index})" required>
+                <label>Age:</label><input type="text" name="children[${index}][age]" readonly required>
+                <label>Catholic?:</label><select name="children[${index}][isCatholic]" required><option value="Yes">Yes</option><option value="No">No</option></select>
+                <label>Church Activities:</label><textarea name="children[${index}][churchActivities]"></textarea>
+
+                <div class="sub-section">
+                    <h4>Baptism</h4>
+                    <label>Baptised?:</label><select name="children[${index}][isBaptised]" onchange="toggleFields(this, 'baptism', ${index}, 'child')"><option value="No">No</option><option value="Yes">Yes</option></select>
+                    <div id="baptism-fields-child-${index}" style="display: none;">
+                        <label>Date of Baptism:</label><input type="date" name="children[${index}][dateOfBaptism]">
+                        <label>Registration Number:</label><input type="text" name="children[${index}][baptismRegistrationNo]">
+                        <label>Church of Baptism:</label><input type="text" name="children[${index}][baptismChurch]">
+                        <label>Location of Church:</label><input type="text" name="children[${index}][baptismLocation]">
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h4>1st Communion</h4>
+                    <label>1st Communion?:</label><select name="children[${index}][isFirstCommunion]" onchange="toggleFields(this, 'firstCommunion', ${index}, 'child')"><option value="No">No</option><option value="Yes">Yes</option></select>
+                    <div id="firstCommunion-fields-child-${index}" style="display: none;">
+                        <label>Date of 1st Communion:</label><input type="date" name="children[${index}][dateFirstCommunion]">
+                        <label>Church of 1st Communion:</label><input type="text" name="children[${index}][firstCommunionChurch]">
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h4>Confirmation</h4>
+                    <label>Confirmation?:</label><select name="children[${index}][isConfirmation]" onchange="toggleFields(this, 'confirmation', ${index}, 'child')"><option value="No">No</option><option value="Yes">Yes</option></select>
+                    <div id="confirmation-fields-child-${index}" style="display: none;">
+                        <label>Date of Confirmation:</label><input type="date" name="children[${index}][dateOfConfirmation]">
+                        <label>Church of Confirmation:</label><input type="text" name="children[${index}][confirmationChurch]">
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function addMember() {
+            const container = document.getElementById('members-container');
+            container.insertAdjacentHTML('beforeend', createMemberForm(memberCount));
+            memberCount++;
+        }
+
+        function addChild() {
+            const container = document.getElementById('children-container');
+            container.insertAdjacentHTML('beforeend', createChildForm(childCount));
+            childCount++;
+        }
+
+        function toggleFields(select, fieldType, index, entityType) {
+            const fields = document.getElementById(`${fieldType}-fields-${entityType}-${index}`);
+            fields.style.display = select.value === 'Yes' ? 'block' : 'none';
+        }
+
+        function calculateAge(input, index) {
+            const dob = new Date(input.value);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+            document.querySelector(`input[name="children[${index}][age]"]`).value = age;
+        }
+
+        document.getElementById('census-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const householdData = {
+                blockName: form['block-name'].value,
+                residentialAddress: form['residential-address'].value,
+                contactNo: form['contact-no'].value
+            };
+            
+            const membersData = [];
+            const members = document.querySelectorAll('.member');
+            members.forEach((member, index) => {
+                const memberObj = {
+                    firstName: member.querySelector(`[name="members[${index}][firstName]"]`).value,
+                    lastName: member.querySelector(`[name="members[${index}][lastName]"]`).value,
+                    dateOfBirth: member.querySelector(`[name="members[${index}][dateOfBirth]"]`).value,
+                    isCatholic: member.querySelector(`[name="members[${index}][isCatholic]"]`).value,
+                    occupation: member.querySelector(`[name="members[${index}][occupation]"]`).value,
+                    churchActivities: member.querySelector(`[name="members[${index}][churchActivities]"]`).value,
+                    solidarityMinistry: member.querySelector(`[name="members[${index}][solidarityMinistry]"]`).value,
+                    leadership: member.querySelector(`[name="members[${index}][leadership]"]`).value,
+                    isBaptised: member.querySelector(`[name="members[${index}][isBaptised]"]`).value,
+                    dateOfBaptism: member.querySelector(`[name="members[${index}][dateOfBaptism]"]`).value,
+                    baptismRegistrationNo: member.querySelector(`[name="members[${index}][baptismRegistrationNo]"]`).value,
+                    baptismChurch: member.querySelector(`[name="members[${index}][baptismChurch]"]`).value,
+                    baptismLocation: member.querySelector(`[name="members[${index}][baptismLocation]"]`).value,
+                    isFirstCommunion: member.querySelector(`[name="members[${index}][isFirstCommunion]"]`).value,
+                    dateFirstCommunion: member.querySelector(`[name="members[${index}][dateFirstCommunion]"]`).value,
+                    firstCommunionChurch: member.querySelector(`[name="members[${index}][firstCommunionChurch]"]`).value,
+                    isConfirmation: member.querySelector(`[name="members[${index}][isConfirmation]"]`).value,
+                    dateOfConfirmation: member.querySelector(`[name="members[${index}][dateOfConfirmation]"]`).value,
+                    confirmationChurch: member.querySelector(`[name="members[${index}][confirmationChurch]"]`).value,
+                    maritalStatus: member.querySelector(`[name="members[${index}][maritalStatus]"]`).value,
+                    civilCourtMarriageDate: member.querySelector(`[name="members[${index}][civilCourtMarriageDate]"]`).value,
+                    churchMarriageDate: member.querySelector(`[name="members[${index}][churchMarriageDate]"]`).value,
+                    churchMarriagePlace: member.querySelector(`[name="members[${index}][churchMarriagePlace]"]`).value,
+                    isDivorced: member.querySelector(`[name="members[${index}][isDivorced]"]`).value,
+                    isDikabelo: member.querySelector(`[name="members[${index}][isDikabelo]"]`).value,
+                    dateLastDikabelo: member.querySelector(`[name="members[${index}][dateLastDikabelo]"]`).value
+                };
+                membersData.push(memberObj);
+            });
+
+            const childrenData = [];
+            const children = document.querySelectorAll('.child');
+            children.forEach((child, index) => {
+                const childObj = {
+                    firstName: child.querySelector(`[name="children[${index}][firstName]"]`).value,
+                    lastName: child.querySelector(`[name="children[${index}][lastName]"]`).value,
+                    dateOfBirth: child.querySelector(`[name="children[${index}][dateOfBirth]"]`).value,
+                    age: child.querySelector(`[name="children[${index}][age]"]`).value,
+                    isCatholic: child.querySelector(`[name="children[${index}][isCatholic]"]`).value,
+                    churchActivities: child.querySelector(`[name="children[${index}][churchActivities]"]`).value,
+                    isBaptised: child.querySelector(`[name="children[${index}][isBaptised]"]`).value,
+                    dateOfBaptism: child.querySelector(`[name="children[${index}][dateOfBaptism]"]`).value,
+                    baptismRegistrationNo: child.querySelector(`[name="children[${index}][baptismRegistrationNo]"]`).value,
+                    baptismChurch: child.querySelector(`[name="children[${index}][baptismChurch]"]`).value,
+                    baptismLocation: child.querySelector(`[name="children[${index}][baptismLocation]"]`).value,
+                    isFirstCommunion: child.querySelector(`[name="children[${index}][isFirstCommunion]"]`).value,
+                    dateFirstCommunion: child.querySelector(`[name="children[${index}][dateFirstCommunion]"]`).value,
+                    firstCommunionChurch: child.querySelector(`[name="children[${index}][firstCommunionChurch]"]`).value,
+                    isConfirmation: child.querySelector(`[name="children[${index}][isConfirmation]"]`).value,
+                    dateOfConfirmation: child.querySelector(`[name="children[${index}][dateOfConfirmation]"]`).value,
+                    confirmationChurch: child.querySelector(`[name="children[${index}][confirmationChurch]"]`).value
+                };
+                childrenData.push(childObj);
+            });
+
+            const payload = {
+                action: 'addRecord',
+                household: householdData,
+                members: membersData,
+                children: childrenData
+            };
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Submission successful! Thank you.');
+                    form.reset();
+                    document.getElementById('members-container').innerHTML = '';
+                    document.getElementById('children-container').innerHTML = '';
+                    memberCount = 0;
+                    childCount = 0;
+                    addMember();
+                } else {
+                    alert('Submission failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            addMember();
+        });
+    </script>
 </body>
 </html>
