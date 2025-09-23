@@ -306,21 +306,21 @@ if (document.getElementById('censusForm')) {
             if (response.ok) {
                 const result = await response.json();
                 if (result.status === 'success') {
-                    alert('Form submitted successfully! Thank you.');
+                    showAlertModal('Form submitted successfully! Thank you.');
                     e.target.reset();
                     document.getElementById('members-container').innerHTML = '';
                     document.getElementById('children-container').innerHTML = '';
                     addMemberForm();
                     addChildForm();
                 } else {
-                    alert('Submission failed: ' + result.message);
+                    showAlertModal('Submission failed: ' + result.message);
                 }
             } else {
-                alert('Submission failed. Please check the console for more details.');
+                showAlertModal('Submission failed. Please check the console for more details.');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred. Please check the console.');
+            showAlertModal('An error occurred. Please check the console.');
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Form';
@@ -344,4 +344,46 @@ if (document.getElementById('censusForm')) {
         const childrenContainer = document.getElementById('children-container');
         childrenContainer.insertAdjacentHTML('beforeend', createChildForm());
     }
+}
+
+function showAlertModal(message) {
+    // Create a temporary modal element
+    const modalContainer = document.createElement('div');
+    modalContainer.id = 'temp-modal';
+    modalContainer.style.cssText = `
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    `;
+
+    modalContent.innerHTML = `
+        <h3>Notification</h3>
+        <p>${message}</p>
+        <button id="modal-ok-btn" style="background-color: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">OK</button>
+    `;
+
+    modalContainer.appendChild(modalContent);
+    document.body.appendChild(modalContainer);
+
+    document.getElementById('modal-ok-btn').onclick = () => {
+        modalContainer.remove();
+    };
 }
