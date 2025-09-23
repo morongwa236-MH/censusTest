@@ -1,4 +1,6 @@
 /* --- Shared functions for dynamic form generation --- */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzKBmomVanswE-E9DJv4exfB1qPaX0v_k1p0CLnnzIGCH7qLrw_0_d-EtsHJJRn1BmL/exec';
+
 function createMemberForm(memberData = {}) {
     const memberId = memberData.MemberID || `new_member_${Date.now()}`;
     const formHtml = `
